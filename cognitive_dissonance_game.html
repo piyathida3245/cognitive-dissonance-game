@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cognitive Dissonance: A Psychology Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8fbff 0%, #e8f3ff 100%);
+            min-height: 100vh;
+            color: #2d3748;
+            overflow-x: hidden;
+        }
+
+        .floating-emoji {
+            position: fixed;
+            font-size: 24px;
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 1;
+            animation: float 8s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(66, 153, 225, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .brain-animation {
+            font-size: 80px;
+            margin: 20px 0;
+            animation: brainPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes brainPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        h1 {
+            color: #3182ce;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        h2 {
+            color: #4299e1;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .intro-text {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #4a5568;
+            margin-bottom: 30px;
+        }
+
+        .score-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(66, 153, 225, 0.15);
+            font-weight: 600;
+            color: #3182ce;
+            z-index: 100;
+        }
+
+        .progress-display {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(66, 153, 225, 0.15);
+            font-weight: 600;
+            color: #3182ce;
+            z-index: 100;
+        }
+
+        .scenario-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: #2d3748;
+        }
+
+        .choices-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .choice-btn {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+            border: none;
+            padding: 20px 30px;
+            border-radius: 15px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            line-height: 1.4;
+            box-shadow: 0 5px 15px rgba(66, 153, 225, 0.3);
+        }
+
+        .choice-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(66, 153, 225, 0.4);
+        }
+
+        .choice-btn:active {
+            transform: translateY(0);
+        }
+
+        .outcome-display {
+            margin: 30px 0;
+            padding: 25px;
+            border-radius: 15px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .low-dissonance {
+            background: linear-gradient(135deg, #81e6d9 0%, #68d391 100%);
+            color: #1a202c;
+        }
+
+        .medium-dissonance {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: #1a202c;
+        }
+
+        .high-dissonance {
+            background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+            color: white;
+        }
+
+        .outcome-emoji {
+            font-size: 60px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .outcome-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .outcome-text {
+            font-size: 1.1em;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .points-earned {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-top: 15px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            box-shadow: 0 5px 15px rgba(66, 153, 225, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(66, 153, 225, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #81e6d9 0%, #68d391 100%);
+            color: #1a202c;
+        }
+
+        .final-score {
+            font-size: 3em;
+            font-weight: 700;
+            color: #3182ce;
+            margin: 20px 0;
+        }
+
+        .score-category {
+            font-size: 1.5em;
+            color: #4299e1;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .educational-summary {
+            text-align: left;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            line-height: 1.6;
+        }
+
+        .educational-summary h3 {
+            color: #3182ce;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .educational-summary p {
+            margin-bottom: 15px;
+            color: #4a5568;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .game-card {
+                padding: 20px;
+            }
+            
+            .score-display, .progress-display {
+                position: static;
+                margin: 10px auto;
+                display: inline-block;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Background Emojis -->
+    <div id="floating-emojis"></div>
+
+    <div class="container">
+        <!-- Score and Progress Displays -->
+        <div class="score-display hidden" id="scoreDisplay">
+            Score: <span id="currentScore">0</span>/100
+        </div>
+        <div class="progress-display hidden" id="progressDisplay">
+            Scenario <span id="currentScenario">1</span> of 10
+        </div>
+
+        <!-- Intro Screen -->
+        <div class="game-card" id="introScreen">
+            <div class="brain-animation">🧠</div>
+            <h1>Cognitive Dissonance Explorer</h1>
+            <p class="intro-text">
+                Welcome to an interactive journey through the fascinating world of cognitive psychology! 
+                You'll navigate through 10 intriguing scenarios where your mind encounters the complex 
+                phenomenon of cognitive dissonance - when your beliefs and actions create internal conflicts. 
+                Discover how your brain responds to these mental puzzles!
+            </p>
+            <p class="intro-text">
+                <strong>How it works:</strong> In each scenario, you'll face choices that may align with or 
+                contradict your stated values. Your decisions will reveal how cognitive dissonance influences 
+                everyday behavior and decision-making.
+            </p>
+            <button class="btn" onclick="startGame()">Begin Your Cognitive Journey</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div class="game-card hidden" id="gameScreen">
+            <div class="brain-animation" id="thinkingBrain">🤔</div>
+            <h2 id="scenarioTitle"></h2>
+            <p class="scenario-text" id="scenarioText"></p>
+            <div class="choices-container" id="choicesContainer"></div>
+        </div>
+
+        <!-- Outcome Screen -->
+        <div class="game-card hidden" id="outcomeScreen">
+            <div class="outcome-display" id="outcomeDisplay">
+                <span class="outcome-emoji" id="outcomeEmoji"></span>
+                <div class="outcome-title" id="outcomeTitle"></div>
+                <div class="outcome-text" id="outcomeText"></div>
+                <div class="points-earned" id="pointsEarned"></div>
+            </div>
+            <button class="btn" onclick="nextScenario()">Continue</button>
+        </div>
+
+        <!-- Final Screen -->
+        <div class="game-card hidden" id="finalScreen">
+            <div class="brain-animation">✨</div>
+            <h1>Journey Complete!</h1>
+            <div class="final-score" id="finalScore"></div>
+            <div class="score-category" id="scoreCategory"></div>
+            
+            <div class="educational-summary">
+                <h3>Understanding Cognitive Dissonance</h3>
+                <p>
+                    <strong>Cognitive dissonance</strong> is the psychological discomfort we experience when our 
+                    beliefs, values, and actions are inconsistent with each other. Discovered by Leon Festinger 
+                    in 1957, this theory explains why we often rationalize our behavior or change our beliefs 
+                    to reduce mental conflict.
+                </p>
+                
+                <h3>Why This Matters</h3>
+                <p>
+                    Understanding cognitive dissonance helps us recognize when we're making biased decisions, 
+                    avoiding difficult truths, or rationalizing poor choices. It's crucial in consumer psychology, 
+                    political behavior, relationship dynamics, and personal growth.
+                </p>
+                
+                <h3>Real-World Applications</h3>
+                <p>
+                    This psychological phenomenon appears everywhere: when smokers downplay health risks, when 
+                    people stick with bad investments to avoid admitting mistakes, or when we justify staying 
+                    in our comfort zones. Recognizing these patterns empowers better decision-making and 
+                    increased self-awareness.
+                </p>
+                
+                <h3>Your Performance</h3>
+                <p id="personalizedFeedback"></p>
+            </div>
+            
+            <button class="btn" onclick="restartGame()">Explore Again</button>
+            <button class="btn btn-secondary" onclick="showIntro()">Return to Start</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let currentScenarioIndex = 0;
+        let totalScore = 0;
+        let gameData = [];
+
+        // Scenario data with cognitive dissonance examples
+        const scenarios = [
+            {
+                title: "The Cookie Jar Dilemma",
+                text: "You've been advocating for healthy eating habits and just posted about your new diet on social media. Walking through the kitchen, you notice a fresh batch of homemade chocolate chip cookies your roommate baked. You're genuinely hungry, and they smell incredible.",
+                choices: [
+                    {
+                        text: "Take one cookie and enjoy it mindfully, acknowledging that occasional treats are part of a balanced lifestyle.",
+                        points: 10,
+                        dissonance: "low",
+                        explanation: "Low dissonance: You're integrating your healthy eating values with realistic flexibility, avoiding rigid thinking."
+                    },
+                    {
+                        text: "Eat several cookies but tell yourself they're 'cheat meal prep' and you'll work out extra hard tomorrow.",
+                        points: 6,
+                        dissonance: "medium",
+                        explanation: "Medium dissonance: You're experiencing some conflict between actions and values, leading to rationalization behaviors."
+                    },
+                    {
+                        text: "Eat multiple cookies while feeling guilty, then criticize yourself for having no willpower despite your public health advocacy.",
+                        points: 3,
+                        dissonance: "high",
+                        explanation: "High dissonance: Strong conflict between public health advocacy and private behavior creates significant psychological discomfort."
+                    }
+                ]
+            },
+            {
+                title: "Social Media Truth",
+                text: "You strongly value truth and accuracy in information sharing. A friend shares a compelling story on social media that aligns perfectly with your political views, but you notice some details that seem questionable and haven't been fact-checked.",
+                choices: [
+                    {
+                        text: "Research the story before sharing, and add context or corrections if needed when you post it.",
+                        points: 10,
+                        dissonance: "low",
+                        explanation: "Low dissonance: Your actions align with your values of truth and accuracy, maintaining cognitive consistency."
+                    },
+                    {
+                        text: "Share it with a disclaimer like 'if true, this is concerning' to cover your bases.",
+                        points: 7,
+                        dissonance: "medium",
+                        explanation: "Medium dissonance: You're partially honoring truth values while still participating in potentially misleading information spread."
+                    },
+                    {
+                        text: "Share it immediately because it supports your viewpoint, reasoning that the broader message matters more than specific details.",
+                        points: 2,
+                        dissonance: "high",
+                        explanation: "High dissonance: Clear conflict between stated commitment to truth and actual behavior of spreading unverified information."
+                    }
+                ]
+            },
+            {
+                title: "Homework Helper",
+                text: "You believe strongly in academic honesty and have criticized others for cheating. A close friend who's struggling in a class you excel in asks you to write their assignment for them because they're overwhelmed with work and family issues.",
+                choices: [
+                    {
+                        text: "Offer to tutor them or help them understand the material, but explain you can't write the assignment for them.",
+                        points: 10,
+                        dissonance: "low",
+                        explanation: "Low dissonance: You're helping your friend while maintaining your academic integrity values through appropriate support."
+                    },
+                    {
+                        text: "Help them outline and structure their ideas extensively, but make sure they write it in their own words.",
+                        points: 8,
+                        dissonance: "medium",
+                        explanation: "Medium dissonance: Walking the line between helping and doing the work creates some tension with strict academic honesty."
+                    },
+                    {
+                        text: "Write the assignment but tell yourself it's different because your friend really needs help and you're just being a good friend.",
+                        points: 1,
+                        dissonance: "high",
+                        explanation: "High dissonance: Direct contradiction between academic honesty beliefs and enabling cheating behavior."
+                    }
+                ]
+            },
+            {
+                title: "Environmental Conscience",
+                text: "You're passionate about environmental protection and regularly post about reducing carbon footprints. You need to get across town for an important meeting, and while public transit would take 90 minutes, a ride-share would take 25 minutes but cost more and have a larger carbon footprint.",
+                choices: [
+                    {
+                        text: "Take public transit and call ahead to explain you might be slightly late due to choosing sustainable transportation.",
+                        points: 10,
+                        dissonance: "low",
+                        explanation: "Low dissonance: Your transportation choice directly aligns with your environmental values, even at personal cost."
+                    },
+                    {
+                        text: "Take the ride-share but purchase carbon offsets later to compensate for the environmental impact.",
+                        points: 7,
+                        dissonance: "medium",
+                        explanation: "Medium dissonance: You're compromising your values but taking steps to maintain consistency through offsetting actions."
+                    },
+                    {
+                        text: "Take the ride-share and justify it by telling yourself that one trip doesn't matter and you're usually environmentally conscious.",
+                        points: 4,
+                        dissonance: "high",
+                        explanation: "High dissonance: Significant gap between environmental advocacy and convenient choice, requiring mental rationalization."
+                    }
+                ]
+            },
+            {
+                title: "Gossip Circle",
+                text: "You pride yourself on not participating in gossip and believe it's harmful to relationships. At a social gathering, your friends are sharing some very interesting and dramatic personal information about someone you all know, and they're encouraging you to share what you know too.",
+                choices: [
+                    {
+                        text: "Politely change the subject or excuse yourself from that part of the conversation.",
+                        points: 10,
+                        dissonance: "low",
+                        explanation: "Low dissonance: Your behavior perfectly matches your anti-gossip values, maintaining personal integrity."
+                    },
+                    {
+                        text: "Listen to the gossip but don't contribute any information yourself.",
+                        points: 6,
+                        dissonance: "medium",
+                        explanation: "Medium dissonance: You're partially compromising your values by consuming gossip while avoiding active participation."
+                    },
+                    {
+                        text: "Join in enthusiastically, reasoning that everyone else is doing it and it's just harmless social bonding.",
+                        points: 2,
+                        dissonance: "high",
+                        explanation: "High dissonance: Direct contradiction between your stated anti-gossip values and active participation in gossip behavior."
+                    }
+                ]
+            },
+            {
+                title: "Money Matters",
+                text: "You often say 'money isn't everything' and criticize overly materialistic culture. You're offered a high-paying job at a company whose practices you morally disagree with, but the salary would solve your financial stress and help your family significantly.",
+                choices: [
+                    {
+                        text: "Decline the offer and continue searching for opportunities that align with your values, even if it takes longer.",
+                        points: 10,
+                        dissonance: "low",
+                        explanation: "Low dissonance: You're prioritizing your moral values over financial gain, maintaining consistency with your stated beliefs."
+                    },
+                    {
+                        text: "Take the job but plan to use your position to create positive change from within the company.",
+                        points: 7,
+                        dissonance: "medium",
+                        explanation: "Medium dissonance: You're finding a middle path that partially honors both financial needs and moral concerns."
+                    },
+                    {
+                        text: "Take the job and tell yourself that you need to be practical and that your previous statements were idealistic.",
+                        points: 3,
+                        dissonance: "high",
+                        explanation: "High dissonance: Significant conflict between anti-materialistic values and choosing money over principles."
+                    }
+                ]
+            },
+            {
+                title: "Exercise Excuse",
+                text: "You frequently encourage others to prioritize fitness and have been posting workout motivation on social media. Today you planned to go to the gym, but you're feeling tired and there's a TV show you really want to binge-watch instead.",
+                choices: [
+                    {
+                        text: "Do a shorter, modified workout at home so you still honor your commitment to daily movement.",
+                        points: 10,
+                        dissonance: "low",
+                        explanation: "Low dissonance: You're adapting your fitness routine while maintaining consistency with your exercise advocacy."
+                    },
+                    {
+                        text: "Skip the workout but plan to do extra tomorrow to make up for it.",
+                        points: 6,
+                        dissonance: "medium",
+                        explanation: "Medium dissonance: Some conflict between fitness advocacy and behavior, but with compensatory planning."
+                    },
+                    {
+                        text: "Skip the workout and decide that rest is actually more important, despite just posting about the importance of daily exercise.",
+                        points: 3,
+                        dissonance: "high",
+                        explanation: "High dissonance: Direct contradiction between public fitness advocacy and personal behavior choices."
+                    }
+                ]
+            },
+            {
+                title: "Friendship Test",
+                text: "You value loyalty in friendships above almost everything else. Your best friend is in a relationship that you can clearly see is emotionally manipulative and harmful, but they seem happy and haven't asked for your opinion.",
+                choices: [
+                    {
+                        text: "Have a careful, loving conversation expressing your concerns while emphasizing your support for them regardless of their decision.",
+                        points: 10,
+                        dissonance: "low",
+                        explanation: "Low dissonance: You're balancing loyalty with genuine care, honoring both friendship values and their wellbeing."
+                    },
+                    {
+                        text: "Stay silent about the relationship but be extra supportive in other areas of their life.",
+                        points: 7,
+                        dissonance: "medium",
+                        explanation: "Medium dissonance: Some tension between wanting to help and respecting their autonomy, resolved through alternative support."
+                    },
+                    {
+                        text: "Say nothing because loyalty means never criticizing your friend's choices, even when you think they're harmful.",
+                        points: 4,
+                        dissonance: "high",
+                        explanation: "High dissonance: Rigid interpretation of loyalty conflicts with caring about your friend's actual wellbeing."
+                    }
+                ]
+            },
+            {
+                title: "Shopping Spree",
+                text: "You frequently criticize consumer culture and pride yourself on buying only what you need. While browsing online, you discover an amazing sale on items you've wanted but don't strictly need - clothes, gadgets, books - all at 70% off.",
+                choices: [
+                    {
+                        text: "Buy only one item that you've wanted for a long time and will genuinely use regularly.",
+                        points: 10,
+                        dissonance: "low",
+                        explanation: "Low dissonance: You're making a thoughtful purchase that balances your anti-consumerist values with reasonable personal desires."
+                    },
+                    {
+                        text: "Buy several items but justify it as 'investment purchasing' since they're such good deals.",
+                        points: 5,
+                        dissonance: "medium",
+                        explanation: "Medium dissonance: You're rationalizing increased consumption through economic reasoning, creating some internal conflict."
+                    },
+                    {
+                        text: "Buy everything you want and tell yourself that you've earned it and that occasional splurges don't contradict your values.",
+                        points: 2,
+                        dissonance: "high",
+                        explanation: "High dissonance: Clear conflict between anti-consumer values and impulsive buying behavior."
+                    }
+                ]
+            },
+            {
+                title: "Phone Addiction",
+                text: "You regularly complain about phone addiction in society and advocate for digital wellness. You're having dinner with family when you receive several notifications from a group chat where something exciting is happening that you really want to follow.",
+                choices: [
+                    {
+                        text: "Keep your phone away and check the messages after dinner, focusing on family time.",
+                        points: 10,
+                        dissonance: "low",
+                        explanation: "Low dissonance: Your behavior perfectly aligns with your digital wellness advocacy and family values."
+                    },
+                    {
+                        text: "Quickly check your phone once or twice but try to stay mostly present with family.",
+                        points: 6,
+                        dissonance: "medium",
+                        explanation: "Medium dissonance: Some compromise between digital wellness values and social connectivity needs."
+                    },
+                    {
+                        text: "Frequently check your phone throughout dinner, telling yourself this is a special situation and usually you're good about phone boundaries.",
+                        points: 3,
+                        dissonance: "high",
+                        explanation: "High dissonance: Significant contradiction between anti-phone addiction stance and compulsive checking behavior."
+                    }
+                ]
+            }
+        ];
+
+        // Game functions
+        function createFloatingEmojis() {
+            const emojis = ['💭', '⚡', '🧩', '💡', '✨', '🔮'];
+            const container = document.getElementById('floating-emojis');
+            
+            setInterval(() => {
+                const emoji = document.createElement('div');
+                emoji.className = 'floating-emoji';
+                emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                emoji.style.left = Math.random() * 100 + '%';
+                emoji.style.animationDuration = (Math.random() * 3 + 5) + 's';
+                container.appendChild(emoji);
+                
+                setTimeout(() => {
+                    if (emoji.parentNode) {
+                        emoji.parentNode.removeChild(emoji);
+                    }
+                }, 8000);
+            }, 1500);
+        }
+
+        function startGame() {
+            document.getElementById('introScreen').classList.add('hidden');
+            document.getElementById('scoreDisplay').classList.remove('hidden');
+            document.getElementById('progressDisplay').classList.remove('hidden');
+            currentScenarioIndex = 0;
+            totalScore = 0;
+            gameData = [];
+            showScenario();
+        }
+
+        function showScenario() {
+            const scenario = scenarios[currentScenarioIndex];
+            const gameScreen = document.getElementById('gameScreen');
+            
+            document.getElementById('currentScenario').textContent = currentScenarioIndex + 1;
+            document.getElementById('scenarioTitle').textContent = scenario.title;
+            document.getElementById('scenarioText').textContent = scenario.text;
+            
+            const choicesContainer = document.getElementById('choicesContainer');
+            choicesContainer.innerHTML = '';
+            
+            scenario.choices.forEach((choice, index) => {
+                const button = document.createElement('button');
+                button.className = 'choice-btn';
+                button.textContent = choice.text;
+                button.onclick = () => makeChoice(index);
+                choicesContainer.appendChild(button);
+            });
+            
+            gameScreen.classList.remove('hidden');
+            
+            // Animate thinking brain
+            const brain = document.getElementById('thinkingBrain');
+            const brainEmojis = ['🤔', '💭', '⚡', '🧠'];
+            let brainIndex = 0;
+            setInterval(() => {
+                brain.textContent = brainEmojis[brainIndex % brainEmojis.length];
+                brainIndex++;
+            }, 1500);
+        }
+
+        function makeChoice(choiceIndex) {
+            const scenario = scenarios[currentScenarioIndex];
+            const choice = scenario.choices[choiceIndex];
+            
+            // Record choice data
+            gameData.push({
+                scenario: scenario.title,
+                choice: choice.text,
+                points: choice.points,
+                dissonance: choice.dissonance
+            });
+            
+            totalScore += choice.points;
+            document.getElementById('currentScore').textContent = totalScore;
+            
+            // Show outcome
+            showOutcome(choice);
+            
+            // Hide game screen
+            document.getElementById('gameScreen').classList.add('hidden');
+        }
+
+        function showOutcome(choice) {
+            const outcomeScreen = document.getElementById('outcomeScreen');
+            const outcomeDisplay = document.getElementById('outcomeDisplay');
+            
+            // Set outcome styling based on dissonance level
+            outcomeDisplay.className = 'outcome-display ' + choice.dissonance + '-dissonance';
+            
+            // Set content based on dissonance level
+            let emoji, title;
+            switch(choice.dissonance) {
+                case 'low':
+                    emoji = '😌';
+                    title = 'Cognitive Harmony';
+                    break;
+                case 'medium':
+                    emoji = '😕';
+                    title = 'Mild Dissonance';
+                    break;
+                case 'high':
+                    emoji = '😰';
+                    title = 'Strong Dissonance';
+                    break;
+            }
+            
+            document.getElementById('outcomeEmoji').textContent = emoji;
+            document.getElementById('outcomeTitle').textContent = title;
+            document.getElementById('outcomeText').textContent = choice.explanation;
+            document.getElementById('pointsEarned').textContent = `+${choice.points} points earned`;
+            
+            outcomeScreen.classList.remove('hidden');
+        }
+
+        function nextScenario() {
+            document.getElementById('outcomeScreen').classList.add('hidden');
+            currentScenarioIndex++;
+            
+            if (currentScenarioIndex < scenarios.length) {
+                showScenario();
+            } else {
+                showFinalScreen();
+            }
+        }
+
+        function showFinalScreen() {
+            document.getElementById('scoreDisplay').classList.add('hidden');
+            document.getElementById('progressDisplay').classList.add('hidden');
+            
+            let category, feedback;
+            if (totalScore >= 85) {
+                category = "Exceptional Cognitive Awareness";
+                feedback = "Outstanding! You demonstrated remarkable consistency between your values and actions. Your ability to recognize and navigate cognitive dissonance shows advanced psychological insight and strong self-awareness.";
+            } else if (totalScore >= 70) {
+                category = "Strong Mental Integration";
+                feedback = "Excellent work! You showed good alignment between beliefs and actions in most scenarios. You have a solid understanding of how to minimize cognitive dissonance while navigating complex social and personal situations.";
+            } else if (totalScore >= 50) {
+                category = "Moderate Cognitive Exploration";
+                feedback = "Good progress! You're developing awareness of cognitive dissonance and its effects. Some scenarios showed tension between your values and choices, which is completely normal and offers valuable learning opportunities.";
+            } else {
+                category = "Rich Learning Opportunity";
+                feedback = "This journey revealed many interesting patterns in decision-making! Cognitive dissonance is challenging for everyone. Your results show areas where you can develop greater awareness of how beliefs and actions interact.";
+            }
+            
+            document.getElementById('finalScore').textContent = totalScore + '/100';
+            document.getElementById('scoreCategory').textContent = category;
+            document.getElementById('personalizedFeedback').textContent = feedback;
+            
+            document.getElementById('finalScreen').classList.remove('hidden');
+        }
+
+        function restartGame() {
+            // Reset game state
+            currentScenarioIndex = 0;
+            totalScore = 0;
+            gameData = [];
+            
+            // Hide final screen
+            document.getElementById('finalScreen').classList.add('hidden');
+            
+            // Reset displays
+            document.getElementById('currentScore').textContent = '0';
+            document.getElementById('currentScenario').textContent = '1';
+            
+            // Start game
+            document.getElementById('scoreDisplay').classList.remove('hidden');
+            document.getElementById('progressDisplay').classList.remove('hidden');
+            showScenario();
+        }
+
+        function showIntro() {
+            // Hide all screens
+            document.getElementById('finalScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('outcomeScreen').classList.add('hidden');
+            document.getElementById('scoreDisplay').classList.add('hidden');
+            document.getElementById('progressDisplay').classList.add('hidden');
+            
+            // Show intro
+            document.getElementById('introScreen').classList.remove('hidden');
+            
+            // Reset game state
+            currentScenarioIndex = 0;
+            totalScore = 0;
+            gameData = [];
+        }
+
+        // Initialize floating emojis when page loads
+        window.addEventListener('load', () => {
+            createFloatingEmojis();
+        });
+    </script>
+</body>
+</html>
